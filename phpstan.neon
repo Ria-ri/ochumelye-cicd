@@ -1,0 +1,13 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 0
+    paths:
+        - app
+        - config
+        - database
+        - tests
+    checkMissingIterableValueType: false
+    ignoreErrors:
+        - '#PHPDoc tag @var#'
