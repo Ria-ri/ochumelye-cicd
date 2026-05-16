@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MasterClass;
-
 class CabinetController extends Controller
 {
     public function __construct()
@@ -16,6 +14,7 @@ class CabinetController extends Controller
     {
         $master = auth()->user();
         $masterClasses = $master->masterClasses()->with('bookings.user')->orderBy('date', 'desc')->get();
+
         return view('cabinet', compact('master', 'masterClasses'));
     }
 }

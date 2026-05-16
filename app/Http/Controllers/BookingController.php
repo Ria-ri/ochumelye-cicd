@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MasterClass;
 use App\Models\Booking;
+use App\Models\MasterClass;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -36,7 +36,7 @@ class BookingController extends Controller
         }
         if ($masterClass->isPassed()) {
             return redirect()->route('category.show', $masterClass->category_id)
-            ->with('error', 'Этот мастер-класс уже прошёл, запись невозможна.');
+                ->with('error', 'Этот мастер-класс уже прошёл, запись невозможна.');
         }
 
         return view('booking.confirm', compact('masterClass', 'user'));
@@ -66,7 +66,7 @@ class BookingController extends Controller
             }
             if ($masterClass->isPassed()) {
                 return redirect()->route('category.show', $masterClass->category_id)
-                ->with('error', 'Этот мастер-класс уже прошёл, запись невозможна.');
+                    ->with('error', 'Этот мастер-класс уже прошёл, запись невозможна.');
             }
 
             Booking::create([
@@ -75,10 +75,12 @@ class BookingController extends Controller
             ]);
 
             DB::commit();
+
             return redirect()->route('category.show', $masterClass->category_id)
                 ->with('success', 'Вы успешно записались на мастер-класс!');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return redirect()->back()->with('error', $e->getMessage());
         }
     }

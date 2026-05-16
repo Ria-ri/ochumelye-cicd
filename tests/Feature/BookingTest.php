@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\MasterClass;
 use App\Models\Booking;
+use App\Models\MasterClass;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class BookingTest extends TestCase
 {
@@ -18,7 +18,7 @@ class BookingTest extends TestCase
         $user = User::factory()->create();
         $masterClass = MasterClass::factory()->create(['capacity' => 5]);
 
-        $response = $this->actingAs($user)->post('/booking/' . $masterClass->id);
+        $response = $this->actingAs($user)->post('/booking/'.$masterClass->id);
 
         $response->assertRedirect(route('category.show', $masterClass->category_id));
         $this->assertDatabaseHas('bookings', [
@@ -35,7 +35,7 @@ class BookingTest extends TestCase
         // заполняем единственное место
         Booking::factory()->create(['master_class_id' => $masterClass->id]);
 
-        $response = $this->actingAs($user)->post('/booking/' . $masterClass->id);
+        $response = $this->actingAs($user)->post('/booking/'.$masterClass->id);
 
         $response->assertSessionHas('error', 'Места закончились.');
         $this->assertDatabaseMissing('bookings', [
@@ -54,7 +54,7 @@ class BookingTest extends TestCase
             'master_class_id' => $masterClass->id,
         ]);
 
-        $response = $this->actingAs($user)->post('/booking/' . $masterClass->id);
+        $response = $this->actingAs($user)->post('/booking/'.$masterClass->id);
 
         $response->assertSessionHas('error', 'Вы уже записаны.');
     }
@@ -65,7 +65,7 @@ class BookingTest extends TestCase
         $master = User::factory()->master()->create();
         $masterClass = MasterClass::factory()->create(['master_id' => $master->id]);
 
-        $response = $this->actingAs($master)->post('/booking/' . $masterClass->id);
+        $response = $this->actingAs($master)->post('/booking/'.$masterClass->id);
 
         $response->assertSessionHas('error', 'Вы не можете записаться на собственный мастер-класс.');
     }

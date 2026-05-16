@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
-use App\Models\MasterClass;
 use App\Models\Booking;
+use App\Models\MasterClass;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class MasterClassModelTest extends TestCase
 {

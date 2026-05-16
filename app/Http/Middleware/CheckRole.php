@@ -9,9 +9,10 @@ class CheckRole
 {
     public function handle(Request $request, Closure $next, string $role)
     {
-        if (!auth()->check() || auth()->user()->role !== $role) {
-            abort(403, 'Нет доступа. Требуется роль: ' . $role);
+        if (! auth()->check() || auth()->user()->role !== $role) {
+            abort(403, 'Нет доступа. Требуется роль: '.$role);
         }
+
         return $next($request);
     }
 }

@@ -24,7 +24,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, intl
           coverage: xdebug
 
-      - name: Install composer dependencies
+      - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Copy .env.ci to .env
@@ -46,25 +46,25 @@ jobs:
           fi
           echo "✅ Coverage $COVERAGE% is OK"
 
-      - name: Run PHPStan
+      - name: Static analysis (PHPStan)
         run: ./vendor/bin/phpstan analyse --error-format=github --no-progress
 
-      - name: Run Laravel Pint (test mode)
+      - name: Linting (Laravel Pint)
         run: ./vendor/bin/pint --test
 
-      - name: Simulate deploy
+      - name: Simulate deploy (only if previous steps succeeded)
         run: |
           if [ "${{ github.ref_name }}" = "dev" ]; then
             cp .env.dev .env
-            echo "🚀 Deploying to DEV with .env.dev"
-          elif [ "${{ github.ref_name }}" = "uat" ]; then
-            cp .env.uat .env
-            echo "🚀 Deploying to UAT with .env.uat"
+            echo "Deploying to DEV with .env.dev"
+          elif [ "${{ github.ref_name }}" = "qa" ]; then
+            cp .env.qa .env
+            echo "Deploying to QA with .env.qa"
           elif [ "${{ github.ref_name }}" = "main" ] || [ "${{ github.ref_name }}" = "master" ]; then
             cp .env.prod .env
-            echo "🚀 Deploying to PRODUCTION with .env.prod"
+            echo "Deploying to PRODUCTION with .env.prod"
           else
-            echo "ℹ️ No deployment for branch ${{ github.ref_name }}"
+            echo "No deployment for branch ${{ github.ref_name }}"
           fi
           php artisan config:cache
           echo "✅ Deployment simulation completed."
@@ -77,10 +77,8 @@ jobs:
       name: production
       url: https://example.com
     steps:
-      - name: Manual approval step
-        run: echo "🚦 Manual approval required – deployment to production"
-      - name: Final deployment message
-        run: echo "✅ Deployment to PRODUCTION approved and simulated."
+      - name: Manual approval required
+        run: echo "Manual approval step – deployment to PRODUCTION"
 
   notify:
     runs-on: ubuntu-latest

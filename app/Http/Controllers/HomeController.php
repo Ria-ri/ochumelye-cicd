@@ -1,9 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\User;
+
 use App\Models\Category;
-use App\Models\MasterClass;
 
 class HomeController extends Controller
 {
@@ -14,6 +13,7 @@ class HomeController extends Controller
         if (auth()->check()) {
             $userBookings = auth()->user()->bookings()->with('masterClass')->get();
         }
+
         return view('home', compact('categories', 'userBookings'));
     }
 }

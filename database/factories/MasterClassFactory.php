@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MasterClass>
+ * @extends Factory<MasterClass>
  */
 class MasterClassFactory extends Factory
 {
@@ -18,6 +18,7 @@ class MasterClassFactory extends Factory
     {
         $date = fake()->dateTimeBetween('+1 day', '+1 month');
         $timeSlots = ['9-11', '11-13', '13-15', '15-17'];
+
         return [
             'category_id' => Category::factory(),
             'master_id' => User::factory()->master(),
