@@ -29,7 +29,7 @@ class CategoryPageTest extends TestCase
 
         $response = $this->get(route('category.show', $category));
         // В шаблоне отображаются стоимость и описание, но не заголовок
-        $response->assertSee($masterClass->cost);
+        $response->assertSee((string) $masterClass->cost);
         $response->assertSee($masterClass->description);
     }
 
