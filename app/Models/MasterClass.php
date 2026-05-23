@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Booking;
 use App\Models\User;
+use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,8 +23,8 @@ class MasterClass extends Model
         return $this->belongsTo(Category::class);
     }
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
+ * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+ */
     public function master()
     {
         return $this->belongsTo(User::class, 'master_id');
@@ -52,7 +53,7 @@ class MasterClass extends Model
         if ($mcDate->isPast()) {
             return true;
         }
-        
+
         if ($mcDate->isToday()) {
             $end = match ($this->time_slot) {
                 '9-11' => 11,
