@@ -21,7 +21,9 @@ class MasterClass extends Model
     {
         return $this->belongsTo(Category::class);
     }
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function master()
     {
         return $this->belongsTo(User::class, 'master_id');
