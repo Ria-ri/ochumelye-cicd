@@ -7,7 +7,9 @@ on:
     branches: [ dev, uat, main ]
 
 jobs:
+  # Job для dev и uat (без ручного аппрува)
   build-and-test:
+    if: github.ref_name != 'main' && github.ref_name != 'master'
     runs-on: ubuntu-latest
     
     steps:
@@ -58,14 +60,10 @@ jobs:
           elif [ "${{ github.ref_name }}" = "uat" ]; then
             cp .env.uat .env
             echo "Deploying to UAT with .env.uat"
-          elif [ "${{ github.ref_name }}" = "main" ] || [ "${{ github.ref_name }}" = "master" ]; then
-            cp .env.prod .env
-            echo "Deploying to PRODUCTION with .env.prod"
-          else
-            echo "No deployment for branch ${{ github.ref_name }}"
           fi
           php artisan config:cache
           echo "✅ Deployment simulation completed."
+
       - name: Send email notification
         if: always()
         uses: dawidd6/action-send-mail@v3
@@ -82,8 +80,74 @@ jobs:
             Pipeline Status: ${{ job.status }}
             Branch: ${{ github.ref_name }}
             Commit: ${{ github.sha }}
-            Repository: ${{ github.repository }}
             Workflow Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            
-            View details: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            
+
+  #  Job для main (С РУЧНЫМ АППРУВОМ)
+  build-and-test-production:
+    if: github.ref_name == 'main' || github.ref_name == 'master'
+    runs-on: ubuntu-latest
+    environment: production 
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, intl
+          coverage: xdebug
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Copy .env.ci to .env
+        run: cp .env.ci .env
+
+      - name: Generate app key
+        run: php artisan key:generate
+
+      - name: Run migrations
+        run: php artisan migrate --force
+
+      - name: Run tests with coverage
+        run: |
+          ./vendor/bin/phpunit --coverage-clover coverage.xml --coverage-text > coverage-text.log
+          COVERAGE=$(grep -oP 'Lines: \K\d+\.\d+' coverage-text.log | head -1)
+          if (( $(echo "$COVERAGE < 50" | bc -l) )); then
+            echo "❌ Coverage $COVERAGE% is below 50%"
+            exit 1
+          fi
+          echo "✅ Coverage $COVERAGE% is OK"
+
+      - name: Static analysis (PHPStan)
+        run: ./vendor/bin/phpstan analyse --error-format=github --no-progress
+
+      - name: Linting (Laravel Pint)
+        run: ./vendor/bin/pint --test
+
+      - name: Simulate deploy to production
+        run: |
+          cp .env.prod .env
+          echo "Deploying to PRODUCTION with .env.prod"
+          php artisan config:cache
+          echo "✅ Production deployment simulation completed."
+
+      - name: Send email notification
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "📢 CI/CD Pipeline ${{ job.status }} - PRODUCTION"
+          to: ${{ secrets.EMAIL_TO }}
+          from: "GitHub Actions CI/CD"
+          body: |
+            Pipeline Status: ${{ job.status }}
+            Branch: PRODUCTION (main)
+            Commit: ${{ github.sha }}
+            Workflow Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
