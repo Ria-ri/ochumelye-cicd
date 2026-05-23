@@ -16,3 +16,4 @@ Pipeline запускается при push/pull request в ветки: dev, uat
 
 ## Notifications
 GitHub Collaborators получают уведомления о результатах..
+Repository secrets также отправляет уведомления выбранным пользователям на почту
