@@ -15,4 +15,4 @@ Pipeline запускается при push/pull request в ветки: dev, uat
 - main → .env.prod (требует manual approval)
 
 ## Notifications
-GitHub Collaborators получают уведомления о результатах
+GitHub Collaborators получают уведомления о результатах..
