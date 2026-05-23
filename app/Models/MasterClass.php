@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use App\Models\Booking;
 use App\Models\User;
 use Carbon\Carbon;
@@ -10,12 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 class MasterClass extends Model
 {
     use HasFactory;
-
-    /**
-     * * @property-read \App\Models\User|null $master
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Booking> $bookings
- 
- */
 
     protected $fillable = [
         'category_id', 'master_id', 'title', 'description',
@@ -27,7 +22,7 @@ class MasterClass extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function master(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function master()
     {
         return $this->belongsTo(User::class, 'master_id');
     }
@@ -52,11 +47,10 @@ class MasterClass extends Model
         $currentTime = now();
         $mcDate = Carbon::parse($this->date);
 
-        // Если дата в прошлом – точно прошёл
         if ($mcDate->isPast()) {
             return true;
         }
-        // Если дата сегодня проверяем время окончания слота
+        
         if ($mcDate->isToday()) {
             $end = match ($this->time_slot) {
                 '9-11' => 11,
@@ -66,7 +60,7 @@ class MasterClass extends Model
             };
             $currentHour = (int) $currentTime->format('H');
             if ($currentHour >= $end) {
-                return true; // слот уже закончился
+                return true;
             }
         }
 
@@ -74,7 +68,7 @@ class MasterClass extends Model
     }
 
     public function scopeUpcoming($query)
-{
-    return $query->where('date', '>=', now()->toDateString());
-}
+    {
+        return $query->where('date', '>=', now()->toDateString());
+    }
 }
