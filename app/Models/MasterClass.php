@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-use App\Models\Booking;
-use App\Models\User;
-use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MasterClass extends Model
 {
@@ -22,9 +20,10 @@ class MasterClass extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
     /**
- * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
- */
+     * @return BelongsTo
+     */
     public function master()
     {
         return $this->belongsTo(User::class, 'master_id');
